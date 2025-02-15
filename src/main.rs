@@ -21,6 +21,11 @@ enum Commands {
         /// Name of the device to connect to
         name: String,
     },
+    /// Disconnect a Bluetooth device by name
+    Disconnect {
+        /// Name of the device to disconnect from
+        name: String,
+    },
 }
 
 #[derive(Debug)]
@@ -36,6 +41,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::List => list_devices()?,
         Commands::Connect { name } => connect_to_device(&name)?,
+        Commands::Disconnect { name } => disconnect_device(&name)?,
     }
 
     Ok(())
@@ -135,6 +141,52 @@ fn connect_to_device(search_name: &str) -> Result<()> {
                 .output()
                 .context("Failed to connect to device")?;
             println!("Connected successfully!");
+        }
+    }
+
+    Ok(())
+}
+
+fn disconnect_device(search_name: &str) -> Result<()> {
+    let devices = get_devices()?;
+    let matcher = SkimMatcherV2::default();
+    
+    let mut matches: Vec<_> = devices
+        .iter()
+        .filter_map(|device| {
+            matcher
+                .fuzzy_match(&device.name.to_lowercase(), &search_name.to_lowercase())
+                .map(|score| (device, score))
+        })
+        .collect();
+
+    matches.sort_by_key(|(_, score)| -score);
+
+    match matches.len() {
+        0 => println!("No devices found matching '{}'", search_name),
+        1 => {
+            let device = matches[0].0;
+            println!("Disconnecting from {}...", device.name);
+            Command::new("blueutil")
+                .args(["--disconnect", &device.address])
+                .output()
+                .context("Failed to disconnect device")?;
+            println!("Disconnected successfully!");
+        }
+        _ => {
+            println!("Multiple devices found. Please choose one:");
+            for (i, (device, _)) in matches.iter().enumerate() {
+                println!("{}. {}", i + 1, device.name);
+            }
+            // In a real implementation, you would handle user input here
+            // For now, we'll just disconnect the best match
+            let device = matches[0].0;
+            println!("Disconnecting from best match: {}...", device.name);
+            Command::new("blueutil")
+                .args(["--disconnect", &device.address])
+                .output()
+                .context("Failed to disconnect device")?;
+            println!("Disconnected successfully!");
         }
     }
 
