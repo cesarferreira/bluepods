@@ -1,0 +1,12 @@
+[package]
+name = "bluepods"
+version = "0.1.0"
+edition = "2021"
+authors = ["César Ferreira"]
+description = "A user-friendly CLI tool to manage Bluetooth devices on macOS"
+
+[dependencies]
+clap = { version = "4.5.1", features = ["derive"] }
+anyhow = "1.0.80"
+fuzzy-matcher = "0.3.7"
+colored = "2.1.0" 
