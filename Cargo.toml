@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 authors = ["César Ferreira"]
 description = "A user-friendly CLI tool to manage Bluetooth devices on macOS"
+license = "MIT"
+repository = "https://github.com/cesarferreira/bluepods"
+homepage = "https://github.com/cesarferreira/bluepods"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.5.1", features = ["derive"] }

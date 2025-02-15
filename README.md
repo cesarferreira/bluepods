@@ -13,6 +13,14 @@
 
 ## Installation
 
+1. Install the `bluepods` binary using Cargo:
+```bash
+cargo install bluepods
+```
+
+This will install the `bluepods` binary in your system, making it available globally.
+
+### Manual install
 1. Clone this repository
 2. Build and install the binary:
 ```bash
