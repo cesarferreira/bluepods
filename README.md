@@ -5,8 +5,15 @@
 ![BluePods](media/ss2.png)
 
 
-## Usage
+## Features
 
+- 🔍 Fuzzy search for device names
+- 📱 Easy connection/disconnection to devices by name
+- 🎨 Colored output for better visibility
+- ✨ Case-insensitive matching
+- 📊 Comprehensive system status view 
+
+## Usage
 
 ### List all paired devices
 ```bash
@@ -47,14 +54,6 @@ This will display a comprehensive overview of your Bluetooth system:
 - Default audio output device
 - List of paired devices with connection status
 - System discoverable state
-
-## Features
-
-- 🔍 Fuzzy search for device names
-- 📱 Easy connection/disconnection to devices by name
-- 🎨 Colored output for better visibility
-- ✨ Case-insensitive matching
-- 📊 Comprehensive system status view 
 
 
 ## Prerequisites
