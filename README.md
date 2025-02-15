@@ -1,6 +1,9 @@
 # BluePods
 
-A user-friendly CLI tool to manage Bluetooth devices on macOS.
+> A user-friendly CLI tool to manage Bluetooth devices on macOS.
+
+![BluePods](media/ss2.png)
+
 
 ## Prerequisites
 
