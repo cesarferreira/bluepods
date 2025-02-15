@@ -5,45 +5,8 @@
 ![BluePods](media/ss2.png)
 
 
-## Prerequisites
-
-- macOS
-- [blueutil](https://github.com/toy/blueutil) installed (`brew install blueutil`)
-- Rust and Cargo installed
-
-## Installation
-
-1. Install the `bluepods` binary using Cargo:
-```bash
-cargo install bluepods
-```
-
-This will install the `bluepods` binary in your system, making it available globally.
-
-### Manual install
-1. Clone this repository
-2. Build and install the binary:
-```bash
-cargo install --path .
-```
-
-This will install the `bluepods` binary in your system, making it available globally.
-
 ## Usage
 
-### Show Bluetooth Status
-```bash
-bluepods status
-```
-
-![Status](media/status.png)
-
-
-This will display a comprehensive overview of your Bluetooth system:
-- Bluetooth power state
-- Default audio output device
-- List of paired devices with connection status
-- System discoverable state
 
 ### List all paired devices
 ```bash
@@ -70,6 +33,21 @@ bluepods disconnect airpods
 
 If multiple devices match your search, you'll be shown a list to choose from.
 
+
+### Show Bluetooth Status
+```bash
+bluepods status
+```
+
+![Status](media/status.png)
+
+
+This will display a comprehensive overview of your Bluetooth system:
+- Bluetooth power state
+- Default audio output device
+- List of paired devices with connection status
+- System discoverable state
+
 ## Features
 
 - 🔍 Fuzzy search for device names
@@ -77,3 +55,28 @@ If multiple devices match your search, you'll be shown a list to choose from.
 - 🎨 Colored output for better visibility
 - ✨ Case-insensitive matching
 - 📊 Comprehensive system status view 
+
+
+## Prerequisites
+
+- macOS
+- [blueutil](https://github.com/toy/blueutil) installed (`brew install blueutil`)
+- Rust and Cargo installed
+
+## Installation
+
+1. Install the `bluepods` binary using Cargo:
+```bash
+cargo install bluepods
+```
+
+This will install the `bluepods` binary in your system, making it available globally.
+
+### Manual install
+1. Clone this repository
+2. Build and install the binary:
+```bash
+cargo install --path .
+```
+
+This will install the `bluepods` binary in your system, making it available globally.
