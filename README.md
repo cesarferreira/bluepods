@@ -23,6 +23,17 @@ This will install the `bluepods` binary in your system, making it available glob
 
 ## Usage
 
+### Show Bluetooth Status
+```bash
+bluepods status
+```
+
+This will display a comprehensive overview of your Bluetooth system:
+- Bluetooth power state
+- Default audio output device
+- List of paired devices with connection status
+- System discoverable state
+
 ### List all paired devices
 ```bash
 bluepods list
@@ -53,4 +64,5 @@ If multiple devices match your search, you'll be shown a list to choose from.
 - 🔍 Fuzzy search for device names
 - 📱 Easy connection/disconnection to devices by name
 - 🎨 Colored output for better visibility
-- ✨ Case-insensitive matching 
+- ✨ Case-insensitive matching
+- 📊 Comprehensive system status view 
