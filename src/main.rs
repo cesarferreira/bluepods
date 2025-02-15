@@ -4,6 +4,7 @@ use colored::*;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use std::process::Command;
+use serde_json::Value;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -85,76 +86,61 @@ fn get_device_battery(name: &str) -> Option<i32> {
 
 fn get_devices_with_battery() -> Result<Vec<BluetoothDevice>> {
     let output = Command::new("system_profiler")
-        .args(["SPBluetoothDataType"])
+        .args(["-json", "SPBluetoothDataType"])
         .output()
         .context("Failed to execute system_profiler command")?;
 
     let output_str = String::from_utf8_lossy(&output.stdout);
+    let json: Value = serde_json::from_str(&output_str)
+        .context("Failed to parse JSON output")?;
+
     let mut devices = Vec::new();
-    let mut current_device: Option<BluetoothDevice> = None;
-    let mut in_connected_section = false;
 
-    for line in output_str.lines() {
-        let trimmed = line.trim();
+    // Helper function to process device entries
+    fn process_device_entry(entry: &Value, connected: bool) -> Option<BluetoothDevice> {
+        let (name, details) = entry.as_object()?.iter().next()?;
         
-        if trimmed == "Connected:" {
-            in_connected_section = true;
-            continue;
-        } else if trimmed == "Not Connected:" {
-            in_connected_section = false;
-        }
+        let address = details.get("device_address")?.as_str()?.to_string();
+        
+        // Get battery information
+        let battery = Some(BatteryInfo {
+            left: details.get("device_batteryLevelLeft")
+                .and_then(|v| v.as_str())
+                .and_then(|s| s.trim_end_matches('%').parse().ok()),
+            right: details.get("device_batteryLevelRight")
+                .and_then(|v| v.as_str())
+                .and_then(|s| s.trim_end_matches('%').parse().ok()),
+            single: details.get("device_batteryLevel")
+                .and_then(|v| v.as_str())
+                .and_then(|s| s.trim_end_matches('%').parse().ok()),
+        });
 
-        if trimmed.ends_with(':') && !trimmed.contains("Address:") {
-            // New device section
-            if let Some(device) = current_device.take() {
-                devices.push(device);
-            }
-            
-            let name = trimmed.trim_end_matches(':').to_string();
-            current_device = Some(BluetoothDevice {
-                name,
-                address: String::new(),
-                connected: in_connected_section,
-                battery: Some(BatteryInfo {
-                    left: None,
-                    right: None,
-                    single: None,
-                }),
-            });
-        } else if let Some(device) = &mut current_device {
-            if trimmed.starts_with("Address: ") {
-                device.address = trimmed.trim_start_matches("Address: ").to_string();
-            } else if trimmed.starts_with("Left Battery Level: ") {
-                if let Some(battery) = &mut device.battery {
-                    battery.left = trimmed
-                        .trim_start_matches("Left Battery Level: ")
-                        .trim_end_matches('%')
-                        .parse()
-                        .ok();
-                }
-            } else if trimmed.starts_with("Right Battery Level: ") {
-                if let Some(battery) = &mut device.battery {
-                    battery.right = trimmed
-                        .trim_start_matches("Right Battery Level: ")
-                        .trim_end_matches('%')
-                        .parse()
-                        .ok();
-                }
-            } else if trimmed.starts_with("Battery Level: ") {
-                if let Some(battery) = &mut device.battery {
-                    battery.single = trimmed
-                        .trim_start_matches("Battery Level: ")
-                        .trim_end_matches('%')
-                        .parse()
-                        .ok();
-                }
-            }
-        }
+        Some(BluetoothDevice {
+            name: name.to_string(),
+            address,
+            connected,
+            battery,
+        })
     }
 
-    // Don't forget the last device
-    if let Some(device) = current_device {
-        devices.push(device);
+    // Process connected devices
+    if let Some(bluetooth_data) = json["SPBluetoothDataType"].get(0) {
+        if let Some(connected_devices) = bluetooth_data["device_connected"].as_array() {
+            for device in connected_devices {
+                if let Some(device_info) = process_device_entry(device, true) {
+                    devices.push(device_info);
+                }
+            }
+        }
+
+        // Process disconnected devices
+        if let Some(disconnected_devices) = bluetooth_data["device_not_connected"].as_array() {
+            for device in disconnected_devices {
+                if let Some(device_info) = process_device_entry(device, false) {
+                    devices.push(device_info);
+                }
+            }
+        }
     }
 
     Ok(devices)
@@ -203,9 +189,9 @@ fn get_default_output_device() -> Result<Option<String>> {
 
 fn get_battery_color(percentage: i32) -> colored::Color {
     match percentage {
-        76..=100 => colored::Color::Green,
-        51..=75 => colored::Color::Yellow,
-        26..=50 => colored::Color::TrueColor {
+        51..=100 => colored::Color::Green,
+        // 26..=50 => colored::Color::Yellow,
+        20..=50 => colored::Color::TrueColor {
             r: 255,
             g: 165,
             b: 0,

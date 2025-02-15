@@ -28,6 +28,9 @@ This will install the `bluepods` binary in your system, making it available glob
 bluepods status
 ```
 
+![Status](media/status.png)
+
+
 This will display a comprehensive overview of your Bluetooth system:
 - Bluetooth power state
 - Default audio output device
