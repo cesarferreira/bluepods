@@ -66,7 +66,7 @@ fn get_devices() -> Result<Vec<BluetoothDevice>> {
                 .unwrap_or("")
                 .to_string();
 
-            let connected = line.contains("connected");
+            let connected = !line.contains("not connected");
 
             devices.push(BluetoothDevice {
                 address,
